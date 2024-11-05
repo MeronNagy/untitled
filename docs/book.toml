@@ -1,0 +1,13 @@
+[book]
+authors = ["MeronNagy"]
+language = "en"
+multilingual = false
+src = "src"
+title = "untitled Documentation"
+
+[rust]
+edition = "2021"
+
+[output.html]
+git-repository-url = "https://github.com/MeronNagy/untitled"
+edit-url-template = "https://github.com/MeronNagy/untitled/edit/main/docs/{path}"
