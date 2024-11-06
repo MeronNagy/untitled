@@ -36,8 +36,7 @@ jobs:
           - platform: 'windows-latest'
             name: 'Windows'
             args: ''
-    env:
-      VERSION: ${{ needs.set-version.outputs.VERSION }}
+
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -71,6 +70,7 @@ jobs:
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.set-version.outputs.VERSION }}
         with:
           tagName: "${{ env.VERSION }}"  # Use the shared timestamp version
           releaseName: "${{ env.VERSION }}"
