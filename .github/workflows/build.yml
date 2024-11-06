@@ -6,6 +6,17 @@ on:
       - main
 
 jobs:
+  set-version:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.set-version.outputs.VERSION }}
+    steps:
+      - name: Generate timestamp version
+        id: set-version
+        run: |
+          VERSION="nightly-$(date +'%Y%m%d%H%M%S')"
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT  # This sets the job output
+
   publish-tauri:
     permissions:
       contents: write
@@ -25,7 +36,8 @@ jobs:
           - platform: 'windows-latest'
             name: 'Windows'
             args: ''
-
+    env:
+      VERSION: ${{ needs.set-version.outputs.VERSION }}
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v4
@@ -54,12 +66,14 @@ jobs:
       - name: install frontend dependencies
         run: pnpm install
 
+
+
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tagName: app-v__VERSION__ # the action automatically replaces \_\_VERSION\_\_ with the app version.
-          releaseName: 'App v__VERSION__'
+          tagName: "${{ env.VERSION }}"  # Use the shared timestamp version
+          releaseName: "${{ env.VERSION }}"
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: true
           prerelease: true
