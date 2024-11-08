@@ -1,11 +1,8 @@
 name: CI
 on:
   push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - "**"
+    paths:
+      - 'src-tauri/**'
 
 defaults:
   run:

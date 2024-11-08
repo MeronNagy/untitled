@@ -4,13 +4,7 @@ permissions:
   contents: read
 
 on:
-  pull_request:
-    paths:
-      - '**/Cargo.toml'
-      - '**/Cargo.lock'
   push:
-    branches:
-      - main
     paths:
       - '**/Cargo.toml'
       - '**/Cargo.lock'
