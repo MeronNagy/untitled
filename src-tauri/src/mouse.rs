@@ -1,15 +1,8 @@
 pub mod commands {
-    use std::time::Duration;
+    use enigo::{Button, Coordinate::Abs, Direction::Click, Enigo, Mouse, Settings};
     use std::thread;
+    use std::time::Duration;
     use tauri::{Emitter, Window};
-    use enigo::{
-        Enigo,
-        Settings,
-        Direction::{Click},
-        Button,
-        Coordinate::{Abs},
-        Mouse
-    };
 
     #[derive(Clone, serde::Serialize)]
     pub struct Position {
@@ -38,7 +31,6 @@ pub mod commands {
                         x: point.0,
                         y: point.1,
                     },
-
                 );
                 thread::sleep(Duration::from_millis(16)); // ~62.5fps update rate
             }
