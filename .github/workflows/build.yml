@@ -5,9 +5,10 @@ on:
     branches:
       - main
     paths:
+      - '**/build.yml'
       - 'src/**'
       - 'src-tauri/**'
-
+      - 'static/**'
 jobs:
   set-version:
     runs-on: ubuntu-latest
