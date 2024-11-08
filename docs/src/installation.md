@@ -1,2 +1,2 @@
 # Installation
-WIP :(
+[Nightly Releases](https://github.com/MeronNagy/untitled/releases)

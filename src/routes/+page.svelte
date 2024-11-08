@@ -20,12 +20,16 @@
     await invoke("keyboard_click", { key });
   }
 
+  function recordKey(event: KeyboardEvent) {
+    last_key = event.key;
+  }
+
   onMount(async () => {
-    // Start mouse tracking
+    window.addEventListener('keydown', recordKey);
+
     await invoke("mouse_listener");
     await invoke("keyboard_listener");
 
-    // Listen for mouse movement events
     const unlistenMouse = await listen('mouse-move', (event: any) => {
       last_x = event.payload.x;
       last_y = event.payload.y;
@@ -43,37 +47,65 @@
 </script>
 
 <main class="container">
-  <h1>WIP</h1>
+  <h1>untitled</h1>
 
-  <form class="row" onsubmit={clickMouse}>
-    <input type="number" id="x-input" placeholder="x" bind:value={x} required/>
-    <input type="number" id="y-input" placeholder="y" bind:value={y} required/>
-    <button type="submit">Click</button>
-  </form>
-  <form class="row" onsubmit={clickKeyboard}>
-    <input
-            type="text"
-            id="key-input"
-            maxlength="1"
-            placeholder="c"
-            bind:value={key}
-            required
-            autocomplete="off"
-    />
-    <button type="submit">Click</button>
-  </form>
 
   <div class="position-display">
-    <h2>Current Mouse Position:</h2>
+    <h2>Click on absolute coordinates</h2>
+    <form class="row" onsubmit={clickMouse}>
+      <input
+              id="x-input"
+              type="number"
+              placeholder="x"
+              bind:value={x}
+              required
+              autocomplete="off"
+      />
+      <input
+              id="y-input"
+              type="number"
+              placeholder="y"
+              bind:value={y}
+              required
+              autocomplete="off"
+      />
+      <button type="submit">Click</button>
+    </form>
+  </div>
+
+
+
+  <div class="position-display">
+    <h2>Simulate Keystroke</h2>
+    <form class="row" onsubmit={clickKeyboard}>
+      <input
+              id="key-input"
+              type="text"
+              placeholder="c"
+              maxlength="1"
+              bind:value={key}
+              required
+              autocomplete="off"
+      />
+      <button type="submit">Click</button>
+    </form>
+
+  </div>
+
+  <div class="position-display">
+    <h2>Current Mouse Position</h2>
     <p>X: {last_x}, Y: {last_y}</p>
   </div>
   <div class="position-display">
-    <h2>Last Key Pressed:</h2>
+    <h2>Last Key Pressed</h2>
     <p>{last_key}</p>
   </div>
   <div class="corner-image">
-    <a href="https://meronnagy.github.io/untitled/">
-      <img src="/images/00219-1214167366-transparent.png" alt="Documentation" />
+    <img src="/images/00219-1214167366-transparent.png" alt="Documentation" />
+  </div>
+  <div class="sticky-top-left">
+    <a href="https://meronnagy.github.io/untitled/" target="_blank">
+      <img src="/icons/help-circle.svg" alt="Help icon" width="24" height="24">
     </a>
   </div>
 </main>
@@ -98,7 +130,7 @@
 
 .container {
   margin: 0;
-  padding-top: 10vh;
+  padding-top: 2vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -177,16 +209,11 @@ button {
     color: #ffffff;
     background-color: #0f0f0f98;
   }
+
   button:active {
     background-color: #0f0f0f69;
   }
 }
-@media (prefers-color-scheme: dark) {
-  .position-display {
-    background-color: #1f1f1f;
-  }
-}
-
 .position-display {
   margin-top: 2rem;
   padding: 1rem;
@@ -194,10 +221,9 @@ button {
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
-
 @media (prefers-color-scheme: dark) {
   .position-display {
-    background-color: #1f1f1f;
+    background-color: rgba(31, 31, 31, 0.8);
   }
 }
 .corner-image {
@@ -211,5 +237,14 @@ button {
 .corner-image img {
   max-width: 200px;
   height: auto;
+}
+
+.sticky-top-left {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000; /* Adjust for layering */
+  margin: 10px; /* Optional: adds space from the edges */
+  cursor: pointer;
 }
 </style>
