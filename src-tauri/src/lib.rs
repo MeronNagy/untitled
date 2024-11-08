@@ -1,5 +1,5 @@
-mod mouse;
 mod keyboard;
+mod mouse;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {

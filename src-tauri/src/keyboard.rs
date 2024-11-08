@@ -1,5 +1,5 @@
 pub mod commands {
-    use winapi::um::winuser::{INPUT_u, INPUT, INPUT_KEYBOARD, KEYEVENTF_KEYUP, SendInput};
+    use winapi::um::winuser::{INPUT_u, SendInput, INPUT, INPUT_KEYBOARD, KEYEVENTF_KEYUP};
 
     #[tauri::command]
     pub fn press(key: char) {
