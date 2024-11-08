@@ -1,59 +1,19 @@
 pub mod commands {
-    use winapi::um::winuser::{INPUT_u, SendInput, INPUT, INPUT_KEYBOARD, KEYEVENTF_KEYUP};
+    use enigo::{
+        Direction::{Click, Press, Release},
+        Enigo, Key, Keyboard, Settings
+    };
 
     #[tauri::command]
-    pub fn press(key: char) {
-        let vk_code = if key.is_ascii_alphabetic() {
-            key.to_ascii_uppercase() as u16
+    pub fn keyboard_click(key: char) {
+        let mut enigo = Enigo::new(&Settings::default()).unwrap();
+
+        if key.is_uppercase() {
+            enigo.key(Key::Shift, Press).unwrap();
+            enigo.key(Key::Unicode(key.to_lowercase().next().unwrap()), Click).unwrap();
+            enigo.key(Key::Shift, Release).unwrap();
         } else {
-            match key {
-                '1'..='9' => key as u16,
-                '0' => 0x30,
-                ' ' => 0x20,
-                '\n' => 0x0D,
-                '\t' => 0x09,
-                _ => {
-                    println!("Unsupported character: {}", key);
-                    return;
-                }
-            }
-        };
-
-        unsafe {
-            let input_press = INPUT {
-                type_: INPUT_KEYBOARD,
-                u: {
-                    let mut u: INPUT_u = std::mem::zeroed();
-                    *u.ki_mut() = std::mem::zeroed();
-                    u.ki_mut().wVk = vk_code;
-                    u.ki_mut().dwFlags = 0;
-                    u.ki_mut().time = 0;
-                    u.ki_mut().dwExtraInfo = 0;
-                    u
-                },
-            };
-
-            let input_release = INPUT {
-                type_: INPUT_KEYBOARD,
-                u: {
-                    let mut u: INPUT_u = std::mem::zeroed();
-                    *u.ki_mut() = std::mem::zeroed();
-                    u.ki_mut().wVk = vk_code;
-                    u.ki_mut().dwFlags = KEYEVENTF_KEYUP;
-                    u.ki_mut().time = 0;
-                    u.ki_mut().dwExtraInfo = 0;
-                    u
-                },
-            };
-
-            let mut inputs = vec![input_press, input_release];
-
-            println!("Sending input: {}", vk_code);
-            SendInput(
-                inputs.len() as u32,
-                inputs.as_mut_ptr(),
-                size_of::<INPUT>() as i32,
-            );
+            enigo.key(Key::Unicode(key), Click).unwrap();
         }
     }
 }

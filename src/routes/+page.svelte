@@ -8,16 +8,15 @@
   let last_x = $state(0);
   let last_y = $state(0);
   let key = $state('c');
-  let last_key = $state("");
 
-  async function click(event: Event) {
+  async function clickMouse(event: Event) {
     event.preventDefault();
-    await invoke("click", { x, y });
+    await invoke("mouse_click", { x, y });
   }
 
-  async function press(event: Event) {
+  async function clickKeyboard(event: Event) {
     event.preventDefault();
-    await invoke("press", { key });
+    await invoke("keyboard_click", { key });
   }
 
   onMount(async () => {
@@ -39,12 +38,12 @@
 <main class="container">
   <h1>WIP</h1>
 
-  <form class="row" onsubmit={click}>
+  <form class="row" onsubmit={clickMouse}>
     <input type="number" id="x-input" placeholder="x" bind:value={x} required/>
     <input type="number" id="y-input" placeholder="y" bind:value={y} required/>
     <button type="submit">Click</button>
   </form>
-  <form class="row" onsubmit={press}>
+  <form class="row" onsubmit={clickKeyboard}>
     <input
             type="text"
             id="key-input"
@@ -52,10 +51,9 @@
             placeholder="c"
             bind:value={key}
             required
-            oninput={() => key = key.toLowerCase()}
             autocomplete="off"
     />
-    <button type="submit">Press</button>
+    <button type="submit">Click</button>
   </form>
 
   <div class="position-display">

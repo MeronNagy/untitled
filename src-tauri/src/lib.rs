@@ -6,8 +6,8 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
-            mouse::commands::click,
-            keyboard::commands::press,
+            mouse::commands::mouse_click,
+            keyboard::commands::keyboard_click,
             mouse::commands::start_tracking,
         ])
         .run(tauri::generate_context!())

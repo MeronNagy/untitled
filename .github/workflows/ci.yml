@@ -51,14 +51,14 @@ jobs:
     strategy:
       matrix:
         include:
-          #- name: Linux x86_64 stable
-          #  os: ubuntu-latest
-          #  rust: stable
-          #  other: i686-unknown-linux-gnu
-          #- name: macOS aarch64 stable
-          #  os: macos-14
-          #  rust: stable
-          #  other: x86_64-apple-darwin
+          - name: Linux x86_64 stable
+            os: ubuntu-latest
+            rust: stable
+            other: i686-unknown-linux-gnu
+          - name: macOS aarch64 stable
+            os: macos-14
+            rust: stable
+            other: x86_64-apple-darwin
           - name: Windows x86_64 MSVC stable
             os: windows-latest
             rust: stable-msvc

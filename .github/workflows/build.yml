@@ -28,15 +28,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          #- platform: 'macos-latest'
-          #  name: 'macOS M1 and above'
-          #  args: '--target aarch64-apple-darwin'
-          #- platform: 'macos-latest' # for Intel based macs.
-          #  name: 'macOS Intel'
-          #  args: '--target x86_64-apple-darwin'
-          #- platform: 'ubuntu-22.04'
-          #  name: 'Linux'
-          #  args: ''
+          - platform: 'macos-latest'
+            name: 'macOS M1 and above'
+            args: '--target aarch64-apple-darwin'
+          - platform: 'macos-latest' # for Intel based macs.
+            name: 'macOS Intel'
+            args: '--target x86_64-apple-darwin'
+          - platform: 'ubuntu-22.04'
+            name: 'Linux'
+            args: ''
           - platform: 'windows-latest'
             name: 'Windows'
             args: ''
