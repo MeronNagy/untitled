@@ -1,6 +1,7 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
-
+  import { onMount } from "svelte";
+  import { listen } from '@tauri-apps/api/event';
 
   let x = $state(0);
   let y = $state(0);
@@ -8,14 +9,31 @@
   let last_y = $state(0);
   let key = $state('c');
   let last_key = $state("");
+
   async function click(event: Event) {
     event.preventDefault();
     await invoke("click", { x, y });
   }
+
   async function press(event: Event) {
     event.preventDefault();
     await invoke("press", { key });
   }
+
+  onMount(async () => {
+    // Start mouse tracking
+    await invoke("start_tracking");
+
+    // Listen for mouse movement events
+    const unlisten = await listen('mouse-move', (event: any) => {
+      last_x = event.payload.x;
+      last_y = event.payload.y;
+    });
+
+    return () => {
+      unlisten();
+    };
+  });
 </script>
 
 <main class="container">
@@ -34,19 +52,21 @@
             placeholder="c"
             bind:value={key}
             required
-            oninput={event => key = key.toLowerCase()}
+            oninput={() => key = key.toLowerCase()}
             autocomplete="off"
     />
     <button type="submit">Press</button>
   </form>
-  <p>
 
-  </p>
-  <p>
-    {#key key}
-      <span>{last_x}</span> <span>{last_y}</span>
-    {/key}
-  </p>
+  <div class="position-display">
+    <h2>Current Mouse Position:</h2>
+    <p>X: {last_x}, Y: {last_y}</p>
+  </div>
+  <div class="corner-image">
+    <a href="https://meronnagy.github.io/untitled/">
+      <img src="/images/00219-1214167366-transparent.png" alt="Documentation" />
+    </a>
+  </div>
 </main>
 
 <style>
@@ -152,5 +172,35 @@ button {
     background-color: #0f0f0f69;
   }
 }
+@media (prefers-color-scheme: dark) {
+  .position-display {
+    background-color: #1f1f1f;
+  }
+}
 
+.position-display {
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  .position-display {
+    background-color: #1f1f1f;
+  }
+}
+.corner-image {
+  position: fixed;
+  top: 0;
+  right: 0;
+  z-index: -100;
+  transform: scaleX(-1);
+}
+
+.corner-image img {
+  max-width: 200px;
+  height: auto;
+}
 </style>

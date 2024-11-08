@@ -10,8 +10,8 @@ pub mod commands {
                 '1'..='9' => key as u16,
                 '0' => 0x30,
                 ' ' => 0x20,
-                '\n' => 0x0D, // Enter key
-                '\t' => 0x09, // Tab key
+                '\n' => 0x0D,
+                '\t' => 0x09,
                 _ => {
                     println!("Unsupported character: {}", key);
                     return;
