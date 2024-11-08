@@ -8,3 +8,6 @@
 # Features
 - [Overview](./features.md)
 - [Windows Specific](./windows-specific-features.md)
+
+# Misc
+- [Resources](./resources.md)
