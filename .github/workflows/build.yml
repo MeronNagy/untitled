@@ -15,7 +15,7 @@ jobs:
   set-version:
     runs-on: ubuntu-latest
     outputs:
-      version: ${{ steps.set-version.outputs.VERSION }}
+      VERSION: ${{ steps.set-version.outputs.VERSION }}
     steps:
       - name: Generate timestamp version
         id: set-version
