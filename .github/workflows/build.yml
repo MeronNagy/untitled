@@ -25,6 +25,7 @@ jobs:
           echo "$VERSION"
 
   publish-tauri:
+    needs: set-version
     permissions:
       contents: write
     strategy:
