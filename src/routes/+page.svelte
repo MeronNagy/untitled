@@ -1,47 +1,55 @@
 <script lang="ts">
   import { invoke } from "@tauri-apps/api/core";
 
-  let name = $state("");
-  let greetMsg = $state("");
 
-  async function greet(event: Event) {
+  let x = $state(0);
+  let y = $state(0);
+  let last_x = $state(0);
+  let last_y = $state(0);
+  let key = $state('c');
+  let last_key = $state("");
+  async function click(event: Event) {
     event.preventDefault();
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    greetMsg = await invoke("greet", { name });
+    await invoke("click", { x, y });
+  }
+  async function press(event: Event) {
+    event.preventDefault();
+    await invoke("press", { key });
   }
 </script>
 
 <main class="container">
-  <h1>Welcome to Tauri + Svelte</h1>
+  <h1>WIP</h1>
 
-  <div class="row">
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo vite" alt="Vite Logo" />
-    </a>
-    <a href="https://tauri.app" target="_blank">
-      <img src="/tauri.svg" class="logo tauri" alt="Tauri Logo" />
-    </a>
-    <a href="https://kit.svelte.dev" target="_blank">
-      <img src="/svelte.svg" class="logo svelte-kit" alt="SvelteKit Logo" />
-    </a>
-  </div>
-  <p>Click on the Tauri, Vite, and SvelteKit logos to learn more.</p>
-
-  <form class="row" onsubmit={greet}>
-    <input id="greet-input" placeholder="Enter a name..." bind:value={name} />
-    <button type="submit">Greet</button>
+  <form class="row" onsubmit={click}>
+    <input type="number" id="x-input" placeholder="x" bind:value={x} required/>
+    <input type="number" id="y-input" placeholder="y" bind:value={y} required/>
+    <button type="submit">Click</button>
   </form>
-  <p>{greetMsg}</p>
+  <form class="row" onsubmit={press}>
+    <input
+            type="text"
+            id="key-input"
+            maxlength="1"
+            placeholder="c"
+            bind:value={key}
+            required
+            oninput={event => key = key.toLowerCase()}
+            autocomplete="off"
+    />
+    <button type="submit">Press</button>
+  </form>
+  <p>
+
+  </p>
+  <p>
+    {#key key}
+      <span>{last_x}</span> <span>{last_y}</span>
+    {/key}
+  </p>
 </main>
 
 <style>
-.logo.vite:hover {
-  filter: drop-shadow(0 0 2em #747bff);
-}
-
-.logo.svelte-kit:hover {
-  filter: drop-shadow(0 0 2em #ff3e00);
-}
 
 :root {
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
@@ -73,10 +81,6 @@
   padding: 1.5em;
   will-change: filter;
   transition: 0.75s;
-}
-
-.logo.tauri:hover {
-  filter: drop-shadow(0 0 2em #24c8db);
 }
 
 .row {
@@ -127,10 +131,6 @@ button:active {
 input,
 button {
   outline: none;
-}
-
-#greet-input {
-  margin-right: 5px;
 }
 
 @media (prefers-color-scheme: dark) {

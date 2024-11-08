@@ -24,15 +24,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest'
-            name: 'macOS M1 and above'
-            args: '--target aarch64-apple-darwin'
-          - platform: 'macos-latest' # for Intel based macs.
-            name: 'macOS Intel'
-            args: '--target x86_64-apple-darwin'
-          - platform: 'ubuntu-22.04'
-            name: 'Linux'
-            args: ''
+          #- platform: 'macos-latest'
+          #  name: 'macOS M1 and above'
+          #  args: '--target aarch64-apple-darwin'
+          #- platform: 'macos-latest' # for Intel based macs.
+          #  name: 'macOS Intel'
+          #  args: '--target x86_64-apple-darwin'
+          #- platform: 'ubuntu-22.04'
+          #  name: 'Linux'
+          #  args: ''
           - platform: 'windows-latest'
             name: 'Windows'
             args: ''
@@ -65,14 +65,12 @@ jobs:
       - name: install frontend dependencies
         run: pnpm install
 
-
-
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ needs.set-version.outputs.VERSION }}
         with:
-          tagName: "${{ env.VERSION }}"  # Use the shared timestamp version
+          tagName: "${{ env.VERSION }}"
           releaseName: "${{ env.VERSION }}"
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: true
