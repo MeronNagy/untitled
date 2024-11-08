@@ -8,6 +8,7 @@
   let last_x = $state(0);
   let last_y = $state(0);
   let key = $state('c');
+  let last_key = $state('');
 
   async function clickMouse(event: Event) {
     event.preventDefault();
@@ -21,16 +22,22 @@
 
   onMount(async () => {
     // Start mouse tracking
-    await invoke("start_tracking");
+    await invoke("mouse_listener");
+    await invoke("keyboard_listener");
 
     // Listen for mouse movement events
-    const unlisten = await listen('mouse-move', (event: any) => {
+    const unlistenMouse = await listen('mouse-move', (event: any) => {
       last_x = event.payload.x;
       last_y = event.payload.y;
     });
 
+    const unlistenKeyboard = await listen('key-click', (event: any) => {
+      last_key = event.payload.key;
+    });
+
     return () => {
-      unlisten();
+      unlistenMouse();
+      unlistenKeyboard();
     };
   });
 </script>
@@ -59,6 +66,10 @@
   <div class="position-display">
     <h2>Current Mouse Position:</h2>
     <p>X: {last_x}, Y: {last_y}</p>
+  </div>
+  <div class="position-display">
+    <h2>Last Key Pressed:</h2>
+    <p>{last_key}</p>
   </div>
   <div class="corner-image">
     <a href="https://meronnagy.github.io/untitled/">

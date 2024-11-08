@@ -19,7 +19,7 @@ pub mod commands {
     }
 
     #[tauri::command]
-    pub fn start_tracking(window: Window) {
+    pub fn mouse_listener(window: Window) {
         thread::spawn(move || {
             let enigo = Enigo::new(&Settings::default()).unwrap();
 

@@ -7,8 +7,9 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![
             mouse::commands::mouse_click,
+            mouse::commands::mouse_listener,
             keyboard::commands::keyboard_click,
-            mouse::commands::start_tracking,
+            keyboard::commands::keyboard_listener,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
