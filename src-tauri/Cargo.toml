@@ -23,8 +23,6 @@ tauri-plugin-shell = "2"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 enigo = "0.2.1"
-rdev = "=0.4.6"
 winapi = { version = "0.3", features = ["winuser", "windef", "timeapi"] }
-device_query = "2.1.0"
 time = "0.3.36"
 tauri-plugin-global-shortcut = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "v2" }
