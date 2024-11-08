@@ -9,6 +9,8 @@ on:
       - 'src/**'
       - 'src-tauri/**'
       - 'static/**'
+  workflow_dispatch:
+
 jobs:
   set-version:
     runs-on: ubuntu-latest
