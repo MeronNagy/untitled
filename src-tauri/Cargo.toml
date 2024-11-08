@@ -2,6 +2,7 @@
 name = "untitled"
 version = "0.1.0"
 description = "untitled"
+license = "MIT"
 authors = ["MeronNagy"]
 edition = "2021"
 
