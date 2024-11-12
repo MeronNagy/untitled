@@ -37,6 +37,7 @@ pub fn run() {
             input::keyboard::keyboard_click,
             input::keyboard::keyboard_listener,
             action_script::orchestrator::orchestrate,
+            action_script::orchestrator::interrupt_orchestration,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

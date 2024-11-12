@@ -13,7 +13,7 @@ static INTERRUPT_ORCHESTRATION: AtomicBool = AtomicBool::new(false);
 pub async fn orchestrate(script: String) -> Result<(), String> {
     INTERRUPT_ORCHESTRATION.store(false, Ordering::Relaxed);
 
-    task::spawn_blocking(move || {
+    let result = task::spawn_blocking(move || {
         let action_script = ActionScript::from_string(&script).map_err(|e| e.to_string())?;
 
         for action in action_script.into_iter() {
@@ -21,9 +21,7 @@ pub async fn orchestrate(script: String) -> Result<(), String> {
                 return Err("Execution cancelled.".to_string());
             }
 
-            if let Err(e) = execute_action(&action) {
-                return Err(e);
-            }
+            execute_action(&action)?;
 
             let delay = action.get_integer_parameter("Delay").unwrap_or(0);
             if delay > 0 {
@@ -32,7 +30,11 @@ pub async fn orchestrate(script: String) -> Result<(), String> {
         }
 
         Ok(())
-    }).await.unwrap()
+    }).await;
+
+    let test = result.map_err(|e| e.to_string())?;
+    println!("{:?}", test);
+    Ok(())
 }
 
 fn execute_action(action: &Action) -> Result<(), String> {
@@ -47,6 +49,7 @@ fn execute_action(action: &Action) -> Result<(), String> {
 
     Ok(())
 }
+
 #[tauri::command]
 pub fn interrupt_orchestration() {
     INTERRUPT_ORCHESTRATION.store(true, Ordering::Relaxed);
