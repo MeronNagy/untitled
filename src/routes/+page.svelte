@@ -27,10 +27,6 @@
     await invoke("keyboard_click", { key });
   }
 
-  function recordKey(event: KeyboardEvent) {
-    last_key = event.key;
-  }
-
   async function executeActionScript(event: Event) {
     event.preventDefault();
     await invoke("orchestrate", { script: actionScriptInput })
@@ -41,8 +37,6 @@
   }
 
   onMount(async () => {
-    window.addEventListener('keydown', recordKey);
-
     await invoke("mouse_listener");
     await invoke("keyboard_listener");
 
