@@ -5,9 +5,15 @@ use std::fmt;
 use std::str::FromStr;
 
 #[derive(Debug, Clone)]
+pub enum ParamValue {
+    Integer(i32),
+    String(String),
+}
+
+#[derive(Debug, Clone)]
 pub struct Action {
     pub action_type: ActionType,
-    parameters: HashMap<String, String>,
+    parameters: HashMap<String, ParamValue>,
 }
 
 impl Action {
@@ -18,64 +24,68 @@ impl Action {
         }
     }
 
-    fn validate_integer_parameter(value: &str) -> Result<i32, ParseError> {
-        value.parse::<i32>().map_err(|_| ParseError::InvalidParameterValue {
-            parameter: value.to_string(),
-            reason: "Value must be an integer".to_string(),
-        })
+    pub fn get_integer_parameter(&self, key: &str) -> Result<i32, String> {
+        match self.parameters.get(key) {
+            Some(ParamValue::Integer(value)) => Ok(*value),
+            Some(_) => Err(format!("Parameter {} is not an integer", key)),
+            None => Err(format!("Parameter {} not found", key)),
+        }
     }
 
     pub fn set_parameter(&mut self, key: &str, value: &str) -> Result<(), ParseError> {
-        // Validate that the parameter is allowed
         match key {
             "X" | "Y" => {
-                // Validate that the value is an integer
-                Self::validate_integer_parameter(value)?;
-                self.parameters.insert(key.to_string(), value.to_string());
+                let int_value = Self::parse_string_to_int(value)?;
+                self.parameters
+                    .insert(key.to_string(), ParamValue::Integer(int_value));
                 Ok(())
             }
             _ => Err(ParseError::InvalidParameter(key.to_string())),
         }
     }
 
-    pub fn get_parameter(&self, key: &str) -> Option<&String> {
-        self.parameters.get(key)
+    fn parse_string_to_int(value: &str) -> Result<i32, ParseError> {
+        value
+            .parse::<i32>()
+            .map_err(|_| ParseError::InvalidParameterValue {
+                parameter: value.to_string(),
+                reason: "Value must be an integer".to_string(),
+            })
     }
 
     fn validate_required_parameters(&self) -> Result<(), ParseError> {
         if self.action_type == ActionType::LeftClick {
-            // Check for required X parameter
-            if !self.parameters.contains_key("X") {
-                return Err(ParseError::MissingParameter("X".to_string()));
-            }
-
-            // Check for required Y parameter
-            if !self.parameters.contains_key("Y") {
-                return Err(ParseError::MissingParameter("Y".to_string()));
-            }
-
-            // Validate that X and Y are valid integers
-            for param in ["X", "Y"] {
-                if let Some(value) = self.parameters.get(param) {
-                    Self::validate_integer_parameter(value)?;
-                }
-            }
+            self.validate_integer_param("X")?;
+            self.validate_integer_param("Y")?;
         }
+
         Ok(())
+    }
+
+    fn validate_integer_param(&self, name: &str) -> Result<(), ParseError> {
+        self.parameters
+            .get(name)
+            .and_then(|param| matches!(param, ParamValue::Integer(_)).then_some(()))
+            .ok_or_else(|| ParseError::MissingParameter(name.to_string()))
     }
 
     pub fn to_string(&self) -> String {
         let mut parts = vec![format!("{:?}", self.action_type)];
 
         for (key, value) in &self.parameters {
-            parts.push(format!("{}={}", key, value));
+            let value_str = match value {
+                ParamValue::Integer(i) => i.to_string(),
+                ParamValue::String(s) => s.clone(),
+            };
+            parts.push(format!("{}={}", key, value_str));
         }
 
         parts.join("; ")
     }
 
     pub fn from_str(s: &str) -> Result<Self, ParseError> {
-        let parts: Vec<&str> = s.split(';')
+        let parts: Vec<&str> = s
+            .split(';')
             .map(str::trim)
             .filter(|s| !s.is_empty())
             .collect();
@@ -91,9 +101,7 @@ impl Action {
             action.set_parameter(kv[0], kv[1])?;
         }
 
-        // Validate required parameters after all parameters are set
         action.validate_required_parameters()?;
-
         Ok(action)
     }
 }

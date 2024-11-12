@@ -13,7 +13,11 @@ pub struct Position {
 pub fn mouse_click(x: i32, y: i32) {
     let mut enigo = Enigo::new(&Settings::default()).unwrap();
 
-    enigo.move_mouse(x, y, Abs).unwrap();
+    let point = enigo.location().unwrap();
+    if point.0 != x || point.1 != y {
+        enigo.move_mouse(x, y, Abs).unwrap();
+    }
+
     enigo.button(Button::Left, Click).unwrap();
 }
 

@@ -23,9 +23,8 @@ impl ActionScript {
         for (line_number, line) in content.lines().enumerate() {
             let line = line.trim();
             if !line.is_empty() {
-                let action = Action::from_str(line).map_err(|err| {
-                    ParseError::with_line_info(line_number + 1, err)
-                })?;
+                let action = Action::from_str(line)
+                    .map_err(|err| ParseError::with_line_info(line_number + 1, err))?;
                 script.add_action(action);
             }
         }
@@ -41,6 +40,7 @@ impl ActionScript {
             .join("\n")
     }
 
+    // Not used atm
     //    pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Self, ParseError> {
     //        let content = fs::read_to_string(path)?;
     //        Self::from_string(&content)

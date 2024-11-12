@@ -19,10 +19,10 @@ fn execute_action(action: Action) -> Result<(), String> {
     match action.action_type {
         ActionType::LeftClick => {
             mouse::mouse_click(
-                action.get_parameter("X"),
-                action.get_parameter("Y")
+                action.get_integer_parameter("X")?,
+                action.get_integer_parameter("Y")?,
             );
-        },
+        }
     }
 
     Ok(())

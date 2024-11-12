@@ -13,10 +13,7 @@ pub enum ParseError {
     InvalidParameter(String),
 
     #[error("Invalid parameter value: {parameter} - {reason}")]
-    InvalidParameterValue {
-        parameter: String,
-        reason: String,
-    },
+    InvalidParameterValue { parameter: String, reason: String },
 
     #[error(transparent)]
     IoError(#[from] std::io::Error),
@@ -36,7 +33,6 @@ impl ParseError {
         }
     }
 }
-
 
 impl From<ParseError> for String {
     fn from(error: ParseError) -> String {
