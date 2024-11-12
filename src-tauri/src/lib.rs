@@ -10,6 +10,7 @@ pub fn run() {
             input::mouse::mouse_listener,
             input::keyboard::keyboard_click,
             input::keyboard::keyboard_listener,
+            action_script::orchestrator::orchestrate,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -9,6 +9,7 @@
   let last_y = $state(0);
   let key = $state('c');
   let last_key = $state('');
+  let actionScriptInput = $state('LeftClick; X=3180; Y=2030\nLeftClick; X=3280; Y=2030');
 
   async function clickMouse(event: Event) {
     event.preventDefault();
@@ -22,6 +23,12 @@
 
   function recordKey(event: KeyboardEvent) {
     last_key = event.key;
+  }
+
+  async function executeActionScript(event: Event) {
+    event.preventDefault();
+    await invoke("orchestrate", { script: actionScriptInput })
+            .catch((error) => console.error(error))
   }
 
   onMount(async () => {
@@ -48,7 +55,25 @@
 
 <main class="container">
   <h1>untitled</h1>
-
+  <div class="position-display">
+    <h2>Current Mouse Position</h2>
+    <p>X: {last_x}, Y: {last_y}</p>
+  </div>
+  <div class="position-display">
+    <h2>Action Script</h2>
+    <form class="row" onsubmit="{executeActionScript}">
+      <textarea
+              id="text-input"
+              placeholder="Enter text here"
+              bind:value={actionScriptInput}
+              rows="4"
+              class="text-area"
+              autocomplete="off"
+      ></textarea>
+      <button type="submit">Execute</button>
+    </form>
+  </div>
+  <h1>Debug / Testing</h1>
   <div class="position-display">
     <h2>Click on absolute coordinates</h2>
     <form class="row" onsubmit={clickMouse}>
@@ -71,7 +96,6 @@
       <button type="submit">Click</button>
     </form>
   </div>
-
   <div class="position-display">
     <h2>Simulate Keystroke</h2>
     <form class="row" onsubmit={clickKeyboard}>
@@ -86,11 +110,6 @@
       />
       <button type="submit">Click</button>
     </form>
-  </div>
-
-  <div class="position-display">
-    <h2>Current Mouse Position</h2>
-    <p>X: {last_x}, Y: {last_y}</p>
   </div>
   <div class="position-display">
     <h2>Last Key Pressed</h2>
@@ -107,140 +126,149 @@
 </main>
 
 <style>
-
-:root {
-  font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: 400;
-
-  color: #0f0f0f;
-  background-color: #f6f6f6;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-text-size-adjust: 100%;
-}
-
-.container {
-  margin: 0;
-  padding-top: 2vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
-}
-
-.row {
-  display: flex;
-  justify-content: center;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-
-a:hover {
-  color: #535bf2;
-}
-
-h1 {
-  text-align: center;
-}
-
-input,
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  color: #0f0f0f;
-  background-color: #ffffff;
-  transition: border-color 0.25s;
-  box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
-}
-
-button {
-  cursor: pointer;
-}
-
-button:hover {
-  border-color: #396cd8;
-}
-button:active {
-  border-color: #396cd8;
-  background-color: #e8e8e8;
-}
-
-input,
-button {
-  outline: none;
-}
-
-@media (prefers-color-scheme: dark) {
   :root {
-    color: #f6f6f6;
-    background-color: #2f2f2f;
+    font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 400;
+
+    color: #0f0f0f;
+    background-color: #f6f6f6;
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .container {
+    margin: 0;
+    padding-top: 2vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .logo {
+    height: 6em;
+    padding: 1.5em;
+    will-change: filter;
+    transition: 0.75s;
+  }
+
+  .row {
+    display: flex;
+    justify-content: center;
+  }
+
+  a {
+    font-weight: 500;
+    color: #646cff;
+    text-decoration: inherit;
   }
 
   a:hover {
-    color: #24c8db;
+    color: #535bf2;
+  }
+
+  h1 {
+    text-align: center;
   }
 
   input,
+  button,
+  .text-area {
+    border-radius: 8px;
+    border: 1px solid transparent;
+    padding: 0.6em 1.2em;
+    font-size: 1em;
+    font-weight: 500;
+    font-family: inherit;
+    color: #0f0f0f;
+    background-color: #ffffff;
+    transition: border-color 0.25s;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+  }
+
+  .text-area {
+    width: 80%;
+    max-width: 600px;
+    resize: vertical;
+    min-height: 100px;
+  }
+
   button {
-    color: #ffffff;
-    background-color: #0f0f0f98;
+    cursor: pointer;
   }
 
+  button:hover {
+    border-color: #396cd8;
+  }
   button:active {
-    background-color: #0f0f0f69;
+    border-color: #396cd8;
+    background-color: #e8e8e8;
   }
-}
-.position-display {
-  margin-top: 2rem;
-  padding: 1rem;
-  background-color: #f0f0f0;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-@media (prefers-color-scheme: dark) {
+
+  input,
+  button,
+  .text-area {
+    outline: none;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color: #f6f6f6;
+      background-color: #2f2f2f;
+    }
+
+    a:hover {
+      color: #24c8db;
+    }
+
+    input,
+    button,
+    .text-area {
+      color: #ffffff;
+      background-color: #0f0f0f98;
+    }
+
+    button:active {
+      background-color: #0f0f0f69;
+    }
+  }
   .position-display {
-    background-color: rgba(31, 31, 31, 0.8);
+    margin-top: 2rem;
+    padding: 1rem;
+    background-color: #f0f0f0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
-}
-.corner-image {
-  position: fixed;
-  top: 0;
-  right: 0;
-  z-index: -100;
-  transform: scaleX(-1);
-}
+  @media (prefers-color-scheme: dark) {
+    .position-display {
+      background-color: rgba(31, 31, 31, 0.8);
+    }
+  }
+  .corner-image {
+    position: fixed;
+    top: 0;
+    right: 0;
+    z-index: -100;
+    transform: scaleX(-1);
+  }
 
-.corner-image img {
-  max-width: 200px;
-  height: auto;
-}
+  .corner-image img {
+    max-width: 200px;
+    height: auto;
+  }
 
-.sticky-top-left {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1000; /* Adjust for layering */
-  margin: 10px; /* Optional: adds space from the edges */
-  cursor: pointer;
-}
+  .sticky-top-left {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    margin: 10px;
+    cursor: pointer;
+  }
 </style>

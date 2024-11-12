@@ -2,6 +2,7 @@ use crate::action_script::action::Action;
 use crate::action_script::error::ParseError;
 use std::fs;
 use std::path::Path;
+use std::fmt;
 
 pub struct ActionScript {
     actions: Vec<Action>,
@@ -48,5 +49,11 @@ impl ActionScript {
     pub fn save_to_file<P: AsRef<Path>>(&self, path: P) -> Result<(), ParseError> {
         fs::write(path, self.to_string())?;
         Ok(())
+    }
+}
+
+impl fmt::Display for ActionScript {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.to_string())
     }
 }
