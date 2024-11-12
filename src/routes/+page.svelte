@@ -20,13 +20,7 @@
     await invoke("keyboard_click", { key });
   }
 
-  function recordKey(event: KeyboardEvent) {
-    last_key = event.key;
-  }
-
   onMount(async () => {
-    window.addEventListener('keydown', recordKey);
-
     await invoke("mouse_listener");
     await invoke("keyboard_listener");
 
@@ -135,13 +129,6 @@
   flex-direction: column;
   justify-content: center;
   text-align: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: 0.75s;
 }
 
 .row {
