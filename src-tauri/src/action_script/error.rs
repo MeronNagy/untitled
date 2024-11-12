@@ -18,7 +18,7 @@ pub enum ParseError {
     #[error(transparent)]
     IoError(#[from] std::io::Error),
 
-    #[error("Error at line {line}: {source}")]
+    #[error("[Line {line}] {source}")]
     WithLineInfo {
         line: usize,
         source: Box<ParseError>,

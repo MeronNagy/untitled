@@ -32,10 +32,10 @@ impl ActionScript {
         Ok(script)
     }
 
-    pub fn to_string(&self) -> String {
+    pub fn as_string(&self) -> String {
         self.actions
             .iter()
-            .map(|action| action.to_string())
+            .map(|action| action.as_string())
             .collect::<Vec<_>>()
             .join("\n")
     }
@@ -46,14 +46,14 @@ impl ActionScript {
     //        Self::from_string(&content)
     //    }
     //    pub fn save_to_file<P: AsRef<Path>>(&self, path: P) -> Result<(), ParseError> {
-    //        fs::write(path, self.to_string())?;
+    //        fs::write(path, self.as_string())?;
     //        Ok(())
     //    }
 }
 
 impl fmt::Display for ActionScript {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.to_string())
+        write!(f, "{}", self.as_string())
     }
 }
 

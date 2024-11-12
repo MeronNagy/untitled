@@ -7,7 +7,7 @@ use std::str::FromStr;
 #[derive(Debug, Clone)]
 pub enum ParamValue {
     Integer(i32),
-    String(String),
+    // not used atm String(String),
 }
 
 #[derive(Debug, Clone)]
@@ -27,7 +27,7 @@ impl Action {
     pub fn get_integer_parameter(&self, key: &str) -> Result<i32, String> {
         match self.parameters.get(key) {
             Some(ParamValue::Integer(value)) => Ok(*value),
-            Some(_) => Err(format!("Parameter {} is not an integer", key)),
+            // not used atm Some(_) => Err(format!("Parameter {} is not an integer", key)),
             None => Err(format!("Parameter {} not found", key)),
         }
     }
@@ -69,13 +69,13 @@ impl Action {
             .ok_or_else(|| ParseError::MissingParameter(name.to_string()))
     }
 
-    pub fn to_string(&self) -> String {
+    pub fn as_string(&self) -> String {
         let mut parts = vec![format!("{:?}", self.action_type)];
 
         for (key, value) in &self.parameters {
             let value_str = match value {
                 ParamValue::Integer(i) => i.to_string(),
-                ParamValue::String(s) => s.clone(),
+                // not used atm ParamValue::String(s) => s.clone(),
             };
             parts.push(format!("{}={}", key, value_str));
         }
@@ -108,6 +108,6 @@ impl Action {
 
 impl fmt::Display for Action {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{}", self.to_string())
+        write!(f, "{}", self.as_string())
     }
 }
