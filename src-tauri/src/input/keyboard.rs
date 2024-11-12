@@ -1,4 +1,4 @@
-use device_query::{DeviceQuery, DeviceState};
+use device_query::{DeviceEvents, DeviceState};
 use enigo::{
     Direction::{Click, Press, Release},
     Enigo, Key, Keyboard, Settings,
@@ -30,24 +30,15 @@ struct KeyboardEvent {
 pub fn keyboard_listener(window: Window) {
     thread::spawn(move || {
         let device_state = DeviceState::new();
-        let mut emitted_keys = std::collections::HashSet::new();
+
+        let _guard = device_state.on_key_down(move |key| {
+            let keyboard_event = KeyboardEvent {
+                key: key.to_string(),
+            };
+            let _ = window.emit("key-click", keyboard_event);
+        });
 
         loop {
-            let keys = device_state.get_keys();
-
-            emitted_keys.retain(|key| keys.contains(key));
-
-            for key in keys {
-                if !emitted_keys.contains(&key) {
-                    let keyboard_event = KeyboardEvent {
-                        key: key.to_string(),
-                    };
-
-                    let _ = window.emit("key-click", keyboard_event);
-                    emitted_keys.insert(key);
-                }
-            }
-
             thread::sleep(Duration::from_millis(10)); // 100 Hz update rate
         }
     });
