@@ -21,20 +21,38 @@ pub async fn orchestrate(script: String) -> Result<(), String> {
                 return Err("Execution cancelled.".to_string());
             }
 
-            execute_action(&action)?;
+            execute_action(&action).map_err(|e| e.to_string())?;
 
             let delay = action.get_integer_parameter("Delay").unwrap_or(0);
             if delay > 0 {
-                thread::sleep(Duration::from_millis(delay as u64));
+                let sleep_interval = 50u64; // milliseconds
+                let mut elapsed_time = 0u64;
+
+                while elapsed_time < delay as u64 {
+                    if INTERRUPT_ORCHESTRATION.load(Ordering::Relaxed) {
+                        return Err("Execution cancelled.".to_string());
+                    }
+
+                    thread::sleep(Duration::from_millis(sleep_interval));
+                    elapsed_time += sleep_interval;
+                }
             }
         }
 
         Ok(())
     }).await;
 
-    let test = result.map_err(|e| e.to_string())?;
-    println!("{:?}", test);
-    Ok(())
+    match result {
+        Ok(Ok(())) => {
+            Ok(())
+        },
+        Ok(Err(e)) => {
+            Err(e)
+        },
+        Err(e) => {
+            Err(e.to_string())
+        }
+    }
 }
 
 fn execute_action(action: &Action) -> Result<(), String> {

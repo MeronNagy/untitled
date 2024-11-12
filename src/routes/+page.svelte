@@ -35,13 +35,12 @@
 
   async function handleExecuteButtonClick(event: Event) {
     event.preventDefault();
-    if (false) {
+    if (isExecuting) {
       await invoke("interrupt_orchestration");
     } else {
-      //isExecuting = true;
+      isExecuting = true;
       await invoke("orchestrate", { script: actionScriptInput })
               .catch((error) => {
-                console.log(error);
                 errorMessage = error;
                 showErrorModal = true;
               })
