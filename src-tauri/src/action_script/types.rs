@@ -3,9 +3,7 @@ use std::str::FromStr;
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum ActionType {
-    MoveMouse,
     LeftClick,
-    Keystroke,
 }
 
 impl FromStr for ActionType {
@@ -14,7 +12,6 @@ impl FromStr for ActionType {
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         match s {
             "LeftClick" => Ok(ActionType::LeftClick),
-            "Keystroke" => Ok(ActionType::Keystroke),
             _ => Err(ParseError::InvalidActionType(s.to_string())),
         }
     }

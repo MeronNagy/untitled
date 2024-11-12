@@ -57,3 +57,12 @@ impl fmt::Display for ActionScript {
         write!(f, "{}", self.to_string())
     }
 }
+
+impl IntoIterator for ActionScript {
+    type Item = Action;
+    type IntoIter = std::vec::IntoIter<Action>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.actions.into_iter()
+    }
+}

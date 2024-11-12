@@ -1,11 +1,12 @@
 use crate::action_script::error::ParseError;
 use crate::action_script::types::ActionType;
 use std::collections::HashMap;
+use std::fmt;
 use std::str::FromStr;
 
 #[derive(Debug, Clone)]
 pub struct Action {
-    action_type: ActionType,
+    pub action_type: ActionType,
     parameters: HashMap<String, String>,
 }
 
@@ -53,5 +54,11 @@ impl Action {
         }
 
         Ok(action)
+    }
+}
+
+impl fmt::Display for Action {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.to_string())
     }
 }

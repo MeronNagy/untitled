@@ -6,15 +6,19 @@ pub enum ParseError {
     MissingParameter(String),
     #[error("Invalid parameter format")]
     InvalidParameterFormat,
+    #[error("Invalid parameter: {0}")]
+    InvalidParameter(String),
+    #[error("Invalid parameter value: {parameter} - {reason}")]
+    InvalidParameterValue {
+        parameter: String,
+        reason: String,
+    },
     #[error(transparent)]
     IoError(#[from] std::io::Error),
 }
 
-impl serde::Serialize for ParseError {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::ser::Serializer,
-    {
-        serializer.serialize_str(self.to_string().as_ref())
+impl From<ParseError> for String {
+    fn from(error: ParseError) -> String {
+        error.to_string()
     }
 }
