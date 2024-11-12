@@ -18,12 +18,50 @@ impl Action {
         }
     }
 
-    pub fn set_parameter(&mut self, key: &str, value: &str) {
-        self.parameters.insert(key.to_string(), value.to_string());
+    fn validate_integer_parameter(value: &str) -> Result<i32, ParseError> {
+        value.parse::<i32>().map_err(|_| ParseError::InvalidParameterValue {
+            parameter: value.to_string(),
+            reason: "Value must be an integer".to_string(),
+        })
+    }
+
+    pub fn set_parameter(&mut self, key: &str, value: &str) -> Result<(), ParseError> {
+        // Validate that the parameter is allowed
+        match key {
+            "X" | "Y" => {
+                // Validate that the value is an integer
+                Self::validate_integer_parameter(value)?;
+                self.parameters.insert(key.to_string(), value.to_string());
+                Ok(())
+            }
+            _ => Err(ParseError::InvalidParameter(key.to_string())),
+        }
     }
 
     pub fn get_parameter(&self, key: &str) -> Option<&String> {
         self.parameters.get(key)
+    }
+
+    fn validate_required_parameters(&self) -> Result<(), ParseError> {
+        if self.action_type == ActionType::LeftClick {
+            // Check for required X parameter
+            if !self.parameters.contains_key("X") {
+                return Err(ParseError::MissingParameter("X".to_string()));
+            }
+
+            // Check for required Y parameter
+            if !self.parameters.contains_key("Y") {
+                return Err(ParseError::MissingParameter("Y".to_string()));
+            }
+
+            // Validate that X and Y are valid integers
+            for param in ["X", "Y"] {
+                if let Some(value) = self.parameters.get(param) {
+                    Self::validate_integer_parameter(value)?;
+                }
+            }
+        }
+        Ok(())
     }
 
     pub fn to_string(&self) -> String {
@@ -50,8 +88,11 @@ impl Action {
             if kv.len() != 2 {
                 return Err(ParseError::InvalidParameterFormat);
             }
-            action.set_parameter(kv[0], kv[1]);
+            action.set_parameter(kv[0], kv[1])?;
         }
+
+        // Validate required parameters after all parameters are set
+        action.validate_required_parameters()?;
 
         Ok(action)
     }
