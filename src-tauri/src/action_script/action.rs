@@ -40,6 +40,12 @@ impl Action {
                     .insert(key.to_string(), ParamValue::Integer(int_value));
                 Ok(())
             }
+            "Delay" => {
+                let int_value = Self::parse_string_to_positive_int(value)?;
+                self.parameters
+                    .insert(key.to_string(), ParamValue::Integer(int_value));
+                Ok(())
+            }
             _ => Err(ParseError::InvalidParameter(key.to_string())),
         }
     }
@@ -53,16 +59,32 @@ impl Action {
             })
     }
 
+    fn parse_string_to_positive_int(value: &str) -> Result<i32, ParseError> {
+        let parsed_value = Self::parse_string_to_int(value)?;
+
+        if parsed_value <= 0 {
+            return Err(ParseError::InvalidParameterValue {
+                parameter: value.to_string(),
+                reason: "Value must be a positive integer".to_string(),
+            });
+        }
+
+        Ok(parsed_value)
+    }
+
+
+
     fn validate_required_parameters(&self) -> Result<(), ParseError> {
         if self.action_type == ActionType::LeftClick {
-            self.validate_integer_param("X")?;
-            self.validate_integer_param("Y")?;
+            self.validate_integer_param_exists("X")?;
+            self.validate_integer_param_exists("Y")?;
+            self.validate_integer_param_exists("Delay")?;
         }
 
         Ok(())
     }
 
-    fn validate_integer_param(&self, name: &str) -> Result<(), ParseError> {
+    fn validate_integer_param_exists(&self, name: &str) -> Result<(), ParseError> {
         self.parameters
             .get(name)
             .and_then(|param| matches!(param, ParamValue::Integer(_)).then_some(()))

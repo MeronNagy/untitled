@@ -15,7 +15,8 @@
   let last_y = $state(0);
   let key = $state('c');
   let last_key = $state('');
-  let actionScriptInput = $state('LeftClick; X=3180; Y=2030\nLeftClick; X=3280; Y=2030');
+  let actionScriptInput = $state('LeftClick; X=3180; Y=2030; Delay=1000\nLeftClick; X=3280; Y=2030; Delay=1000');
+  let executeButtonText = $state('Execute');
 
   async function clickMouse(event: Event) {
     event.preventDefault();
@@ -29,11 +30,16 @@
 
   async function executeActionScript(event: Event) {
     event.preventDefault();
+    executeButtonText = "Stop\n ALT+S"
     await invoke("orchestrate", { script: actionScriptInput })
             .catch((error) => {
               errorMessage = error;
               showErrorModal = true;
-            });
+            })
+            .finally(() => {
+              executeButtonText = "Execute"
+            })
+    ;
   }
 
   onMount(async () => {
@@ -68,7 +74,7 @@
               class="text-area"
               autocomplete="off"
       ></textarea>
-      <button type="submit">Execute</button>
+      <button type="submit">{executeButtonText}</button>
     </form>
   </CommandPanel>
   <h1>Debug / Info</h1>
