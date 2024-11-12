@@ -4,8 +4,6 @@ use thiserror::Error;
 pub enum ParseError {
     #[error("Invalid action type: {0}")]
     InvalidActionType(String),
-    #[error("Invalid simulation type: {0}")]
-    InvalidSimulationType(String),
     #[error("Missing required parameter: {0}")]
     MissingParameter(String),
     #[error("Invalid parameter format")]

@@ -49,7 +49,6 @@
 <main class="container">
   <h1>untitled</h1>
 
-
   <div class="position-display">
     <h2>Click on absolute coordinates</h2>
     <form class="row" onsubmit={clickMouse}>
@@ -73,8 +72,6 @@
     </form>
   </div>
 
-
-
   <div class="position-display">
     <h2>Simulate Keystroke</h2>
     <form class="row" onsubmit={clickKeyboard}>
@@ -89,7 +86,6 @@
       />
       <button type="submit">Click</button>
     </form>
-
   </div>
 
   <div class="position-display">
