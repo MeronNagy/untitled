@@ -1,7 +1,5 @@
 use crate::action_script::action::Action;
 use crate::action_script::error::ParseError;
-use std::fs;
-use std::path::Path;
 use std::fmt;
 
 pub struct ActionScript {
@@ -22,20 +20,17 @@ impl ActionScript {
     pub fn from_string(content: &str) -> Result<Self, ParseError> {
         let mut script = ActionScript::new();
 
-        for line in content.lines() {
+        for (line_number, line) in content.lines().enumerate() {
             let line = line.trim();
             if !line.is_empty() {
-                let action = Action::from_str(line)?;
+                let action = Action::from_str(line).map_err(|err| {
+                    ParseError::with_line_info(line_number + 1, err)
+                })?;
                 script.add_action(action);
             }
         }
 
         Ok(script)
-    }
-
-    pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Self, ParseError> {
-        let content = fs::read_to_string(path)?;
-        Self::from_string(&content)
     }
 
     pub fn to_string(&self) -> String {
@@ -46,10 +41,14 @@ impl ActionScript {
             .join("\n")
     }
 
-    pub fn save_to_file<P: AsRef<Path>>(&self, path: P) -> Result<(), ParseError> {
-        fs::write(path, self.to_string())?;
-        Ok(())
-    }
+    //    pub fn from_file<P: AsRef<Path>>(path: P) -> Result<Self, ParseError> {
+    //        let content = fs::read_to_string(path)?;
+    //        Self::from_string(&content)
+    //    }
+    //    pub fn save_to_file<P: AsRef<Path>>(&self, path: P) -> Result<(), ParseError> {
+    //        fs::write(path, self.to_string())?;
+    //        Ok(())
+    //    }
 }
 
 impl fmt::Display for ActionScript {

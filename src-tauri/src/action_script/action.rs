@@ -75,10 +75,10 @@ impl Action {
     }
 
     pub fn from_str(s: &str) -> Result<Self, ParseError> {
-        let parts: Vec<&str> = s.split(';').map(str::trim).collect();
-        if parts.is_empty() {
-            return Err(ParseError::InvalidParameterFormat);
-        }
+        let parts: Vec<&str> = s.split(';')
+            .map(str::trim)
+            .filter(|s| !s.is_empty())
+            .collect();
 
         let action_type = ActionType::from_str(parts[0])?;
         let mut action = Action::new(action_type);
@@ -86,7 +86,7 @@ impl Action {
         for part in &parts[1..] {
             let kv: Vec<&str> = part.split('=').map(str::trim).collect();
             if kv.len() != 2 {
-                return Err(ParseError::InvalidParameterFormat);
+                return Err(ParseError::InvalidFormat(part.to_string()));
             }
             action.set_parameter(kv[0], kv[1])?;
         }
