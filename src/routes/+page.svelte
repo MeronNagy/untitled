@@ -15,8 +15,14 @@
   let last_y = $state(0);
   let key = $state('c');
   let last_key = $state('');
-  let actionScriptInput = $state('LeftClick; X=3180; Y=2030\nLeftClick; X=3280; Y=2030');
-
+  let actionScriptInput = $state('LeftClick; X=3180; Y=2030; Delay=1000\nLeftClick; X=3280; Y=2030; Delay=1000');
+  let isExecuting = $state(false);
+  let executeButtonText = $derived.by(() => {
+    if (isExecuting) {
+      return "Stop\n ALT+S";
+    }
+    return "Execute";
+  })
   async function clickMouse(event: Event) {
     event.preventDefault();
     await invoke("mouse_click", { x, y });
@@ -27,13 +33,23 @@
     await invoke("keyboard_click", { key });
   }
 
-  async function executeActionScript(event: Event) {
+  async function handleExecuteButtonClick(event: Event) {
     event.preventDefault();
-    await invoke("orchestrate", { script: actionScriptInput })
-            .catch((error) => {
-              errorMessage = error;
-              showErrorModal = true;
-            });
+    if (isExecuting) {
+      await invoke("interrupt_orchestration");
+    } else {
+      isExecuting = true;
+      await invoke("orchestrate", { script: actionScriptInput })
+              .catch((error) => {
+                errorMessage = error;
+                showErrorModal = true;
+              })
+              .finally(() => {
+                isExecuting = false;
+              })
+      ;
+    }
+
   }
 
   onMount(async () => {
@@ -59,7 +75,7 @@
 <main class="container">
   <h1>untitled</h1>
   <CommandPanel title={"Action Script"}>
-    <form class="row" onsubmit="{executeActionScript}">
+    <form class="row" onsubmit="{handleExecuteButtonClick}">
       <textarea
               id="text-input"
               placeholder="Enter text here"
@@ -68,7 +84,7 @@
               class="text-area"
               autocomplete="off"
       ></textarea>
-      <button type="submit">Execute</button>
+      <button type="submit">{executeButtonText}</button>
     </form>
   </CommandPanel>
   <h1>Debug / Info</h1>

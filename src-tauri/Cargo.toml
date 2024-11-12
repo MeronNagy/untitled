@@ -28,5 +28,6 @@ enigo = "0.2.1"
 time = "0.3.36"
 device_query = "2.1.0"
 thiserror = "2"
+tokio = "1.41.0"
 # [target.'cfg(windows)'.dependencies]
 # winapi = { version = "0.3", features = ["winuser", "windef", "timeapi"] }
