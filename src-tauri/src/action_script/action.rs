@@ -72,8 +72,6 @@ impl Action {
         Ok(parsed_value)
     }
 
-
-
     fn validate_required_parameters(&self) -> Result<(), ParseError> {
         if self.action_type == ActionType::LeftClick {
             self.validate_integer_param_exists("X")?;

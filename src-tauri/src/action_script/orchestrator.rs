@@ -2,8 +2,8 @@ use crate::action_script::action::Action;
 use crate::action_script::script::ActionScript;
 use crate::action_script::types::ActionType;
 use crate::input::mouse;
-use std::thread;
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::thread;
 use std::time::Duration;
 use tokio::task;
 
@@ -40,18 +40,13 @@ pub async fn orchestrate(script: String) -> Result<(), String> {
         }
 
         Ok(())
-    }).await;
+    })
+    .await;
 
     match result {
-        Ok(Ok(())) => {
-            Ok(())
-        },
-        Ok(Err(e)) => {
-            Err(e)
-        },
-        Err(e) => {
-            Err(e.to_string())
-        }
+        Ok(Ok(())) => Ok(()),
+        Ok(Err(e)) => Err(e),
+        Err(e) => Err(e.to_string()),
     }
 }
 

@@ -7,22 +7,23 @@ pub fn run() {
         .setup(|app| {
             #[cfg(desktop)]
             {
-                use tauri_plugin_global_shortcut::{Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState};
+                use tauri_plugin_global_shortcut::{
+                    Code, GlobalShortcutExt, Modifiers, Shortcut, ShortcutState,
+                };
 
                 let alt_s_shortcut = Shortcut::new(Some(Modifiers::ALT), Code::KeyS);
                 app.handle().plugin(
-                    tauri_plugin_global_shortcut::Builder::new().with_handler(move |_app, shortcut, event| {
-                        if shortcut == &alt_s_shortcut {
-                            match event.state() {
-                                ShortcutState::Pressed => {
-                                    action_script::orchestrator::interrupt_orchestration()
-                                }
-                                ShortcutState::Released => {
+                    tauri_plugin_global_shortcut::Builder::new()
+                        .with_handler(move |_app, shortcut, event| {
+                            if shortcut == &alt_s_shortcut {
+                                match event.state() {
+                                    ShortcutState::Pressed => {
+                                        action_script::orchestrator::interrupt_orchestration()
+                                    }
+                                    ShortcutState::Released => {}
                                 }
                             }
-
-                        }
-                    })
+                        })
                         .build(),
                 )?;
 
@@ -41,5 +42,4 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
-
 }
