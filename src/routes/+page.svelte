@@ -52,6 +52,16 @@
     }
   }
 
+  async function recordActions(event: Event) {
+    event.preventDefault();
+    await invoke("record_actions")
+            .catch((error) => {
+              errorMessage = error;
+              showErrorModal = true;
+            })
+    ;
+  }
+
   onMount(async () => {
     await invoke("mouse_listener");
     await invoke("keyboard_listener");
@@ -97,6 +107,7 @@
                 min="1"
         />
         <button type="submit">{executeButtonText}</button>
+        <button onclick={recordActions}>Record</button>
       </div>
     </form>
   </CommandPanel>
