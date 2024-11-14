@@ -17,40 +17,7 @@ pub async fn orchestrate(script: String, replay_count: i32) -> Result<(), String
 
     INTERRUPT_ORCHESTRATION.store(false, Ordering::Relaxed);
 
-    let result = task::spawn_blocking(move || {
-        let action_script = ActionScript::from_string(&script).map_err(|e| e.to_string())?;
-
-        let actions: Vec<_> = action_script.into_iter().collect();
-        let mut replay_counter = 0;
-        while replay_counter < replay_count {
-            replay_counter += 1;
-            for action in &actions {
-                if INTERRUPT_ORCHESTRATION.load(Ordering::Relaxed) {
-                    return Err("Execution cancelled.".to_string());
-                }
-
-                execute_action(&action).map_err(|e| e.to_string())?;
-
-                let delay = action.get_integer_parameter("Delay").unwrap_or(0);
-                if delay > 0 {
-                    let sleep_interval = 50u64; // milliseconds
-                    let mut elapsed_time = 0u64;
-
-                    while elapsed_time < delay as u64 {
-                        if INTERRUPT_ORCHESTRATION.load(Ordering::Relaxed) {
-                            return Err("Execution cancelled.".to_string());
-                        }
-
-                        thread::sleep(Duration::from_millis(sleep_interval));
-                        elapsed_time += sleep_interval;
-                    }
-                }
-            }
-        }
-
-        Ok(())
-    })
-    .await;
+    let result = task::spawn_blocking(move || run_script(&script, replay_count)).await;
 
     match result {
         Ok(Ok(())) => Ok(()),
@@ -59,15 +26,71 @@ pub async fn orchestrate(script: String, replay_count: i32) -> Result<(), String
     }
 }
 
+fn run_script(script: &str, replay_count: i32) -> Result<(), String> {
+    let action_script = ActionScript::from_string(script).map_err(|e| e.to_string())?;
+
+    let actions: Vec<_> = action_script.into_iter().collect();
+
+    for _ in 0..replay_count {
+        if INTERRUPT_ORCHESTRATION.load(Ordering::Relaxed) {
+            return Err("Execution cancelled.".to_string());
+        }
+
+        execute_action_script(&actions)?;
+    }
+
+    Ok(())
+}
+
+fn execute_action_script(actions: &[Action]) -> Result<(), String> {
+    for action in actions {
+        if INTERRUPT_ORCHESTRATION.load(Ordering::Relaxed) {
+            return Err("Execution cancelled.".to_string());
+        }
+
+        execute_action(action)?;
+        handle_delay(action)?;
+    }
+
+    Ok(())
+}
+
+fn handle_delay(action: &Action) -> Result<(), String> {
+    let delay = action.get_integer_parameter("Delay").unwrap_or(0);
+    if delay <= 0 {
+        return Ok(());
+    }
+
+    let sleep_interval = 50u64;
+    let mut elapsed_time = 0u64;
+
+    while elapsed_time < delay as u64 {
+        if INTERRUPT_ORCHESTRATION.load(Ordering::Relaxed) {
+            return Err("Execution cancelled.".to_string());
+        }
+
+        thread::sleep(Duration::from_millis(sleep_interval));
+        elapsed_time += sleep_interval;
+    }
+
+    Ok(())
+}
+
 fn execute_action(action: &Action) -> Result<(), String> {
     match action.action_type {
         ActionType::LeftClick => {
-            mouse::mouse_click(
-                action.get_integer_parameter("X")?,
-                action.get_integer_parameter("Y")?,
-            );
+            execute_left_click(action)?;
         }
     }
+
+    Ok(())
+}
+
+fn execute_left_click(action: &Action) -> Result<(), String> {
+    mouse::mouse_click(
+        action.get_integer_parameter("X")?,
+        action.get_integer_parameter("Y")?,
+    );
 
     Ok(())
 }
