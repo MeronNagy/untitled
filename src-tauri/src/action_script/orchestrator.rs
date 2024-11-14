@@ -48,7 +48,6 @@ pub async fn orchestrate(script: String, replay_count: i32) -> Result<(), String
             }
         }
 
-
         Ok(())
     })
     .await;
