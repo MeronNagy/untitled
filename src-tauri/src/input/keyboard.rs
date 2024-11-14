@@ -27,7 +27,7 @@ struct KeyboardEvent {
 }
 
 #[tauri::command]
-pub fn keyboard_listener(window: Window) {
+pub async fn keyboard_listener(window: Window) {
     thread::spawn(move || {
         let device_state = DeviceState::new();
 

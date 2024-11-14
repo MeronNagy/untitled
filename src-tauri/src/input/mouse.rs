@@ -22,7 +22,7 @@ pub fn mouse_click(x: i32, y: i32) {
 }
 
 #[tauri::command]
-pub fn mouse_listener(window: Window) {
+pub async fn mouse_listener(window: Window) {
     thread::spawn(move || {
         let enigo = Enigo::new(&Settings::default()).unwrap();
 

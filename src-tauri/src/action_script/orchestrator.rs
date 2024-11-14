@@ -10,6 +10,11 @@ use tokio::task;
 static INTERRUPT_ORCHESTRATION: AtomicBool = AtomicBool::new(false);
 
 #[tauri::command]
+pub fn interrupt_orchestration() {
+    INTERRUPT_ORCHESTRATION.store(true, Ordering::Relaxed);
+}
+
+#[tauri::command]
 pub async fn orchestrate(script: String, replay_count: i32) -> Result<(), String> {
     if replay_count < 1 {
         return Err("Replay count has to be 1 or greater.".to_string());
@@ -93,9 +98,4 @@ fn execute_left_click(action: &Action) -> Result<(), String> {
     );
 
     Ok(())
-}
-
-#[tauri::command]
-pub fn interrupt_orchestration() {
-    INTERRUPT_ORCHESTRATION.store(true, Ordering::Relaxed);
 }
