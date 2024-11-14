@@ -8,13 +8,12 @@
   let showErrorModal = $state(false);
   let errorMessage = $state('');
 
-
   let x = $state(0);
   let y = $state(0);
-  let last_x = $state(0);
-  let last_y = $state(0);
+  let lastRecordedX = $state(0);
+  let lastRecordedY = $state(0);
   let key = $state('c');
-  let last_key = $state('');
+  let lastRecordedKey = $state('');
   let actionScriptInput = $state('LeftClick; X=3180; Y=2030; Delay=1000\nLeftClick; X=3280; Y=2030; Delay=1000');
   let isExecuting = $state(false);
   let executeButtonText = $derived.by(() => {
@@ -23,6 +22,8 @@
     }
     return "Execute";
   })
+  let replayCount = $state(1);
+
   async function clickMouse(event: Event) {
     event.preventDefault();
     await invoke("mouse_click", { x, y });
@@ -39,7 +40,7 @@
       await invoke("interrupt_orchestration");
     } else {
       isExecuting = true;
-      await invoke("orchestrate", { script: actionScriptInput })
+      await invoke("orchestrate", { script: actionScriptInput, replayCount: replayCount })
               .catch((error) => {
                 errorMessage = error;
                 showErrorModal = true;
@@ -49,7 +50,6 @@
               })
       ;
     }
-
   }
 
   onMount(async () => {
@@ -57,12 +57,12 @@
     await invoke("keyboard_listener");
 
     const unlistenMouse = await listen('mouse-move', (event: any) => {
-      last_x = event.payload.x;
-      last_y = event.payload.y;
+      lastRecordedX = event.payload.x;
+      lastRecordedY = event.payload.y;
     });
 
     const unlistenKeyboard = await listen('key-click', (event: any) => {
-      last_key = event.payload.key;
+      lastRecordedKey = event.payload.key;
     });
 
     return () => {
@@ -75,24 +75,37 @@
 <main class="container">
   <h1>untitled</h1>
   <CommandPanel title={"Action Script"}>
-    <form class="row" onsubmit="{handleExecuteButtonClick}">
-      <textarea
-              id="text-input"
-              placeholder="Enter text here"
-              bind:value={actionScriptInput}
-              rows="4"
-              class="text-area"
-              autocomplete="off"
-      ></textarea>
-      <button type="submit">{executeButtonText}</button>
+    <form onsubmit="{handleExecuteButtonClick}">
+      <div>
+        <textarea
+                id="text-input"
+                bind:value={actionScriptInput}
+                rows="4"
+                class="text-area"
+                autocomplete="off"
+        ></textarea>
+      </div>
+      <div>
+        <label for="replay-input">Replay Count:</label>
+        <input
+                id="replay-input"
+                type="number"
+                bind:value={replayCount}
+                required
+                autocomplete="off"
+                style="width: 4rem"
+                min="1"
+        />
+        <button type="submit">{executeButtonText}</button>
+      </div>
     </form>
   </CommandPanel>
   <h1>Debug / Info</h1>
   <CommandPanel title={"Current Mouse Position"}>
-    <p>X: {last_x}, Y: {last_y}</p>
+    <p>X: {lastRecordedX}, Y: {lastRecordedY}</p>
   </CommandPanel>
   <CommandPanel title={"Last Key Pressed"}>
-    <p>{last_key}</p>
+    <p>{lastRecordedKey}</p>
   </CommandPanel>
   <h1>Debug / Testing</h1>
   <CommandPanel title={"Click on absolute coordinates"}>

@@ -10,34 +10,44 @@ use tokio::task;
 static INTERRUPT_ORCHESTRATION: AtomicBool = AtomicBool::new(false);
 
 #[tauri::command]
-pub async fn orchestrate(script: String) -> Result<(), String> {
+pub async fn orchestrate(script: String, replay_count: i32) -> Result<(), String> {
+    if replay_count < 1 {
+        return Err("Replay count has to be 1 or greater.".to_string());
+    }
+
     INTERRUPT_ORCHESTRATION.store(false, Ordering::Relaxed);
 
     let result = task::spawn_blocking(move || {
         let action_script = ActionScript::from_string(&script).map_err(|e| e.to_string())?;
 
-        for action in action_script.into_iter() {
-            if INTERRUPT_ORCHESTRATION.load(Ordering::Relaxed) {
-                return Err("Execution cancelled.".to_string());
-            }
+        let actions: Vec<_> = action_script.into_iter().collect();
+        let mut replay_counter = 0;
+        while replay_counter < replay_count {
+            replay_counter += 1;
+            for action in &actions {
+                if INTERRUPT_ORCHESTRATION.load(Ordering::Relaxed) {
+                    return Err("Execution cancelled.".to_string());
+                }
 
-            execute_action(&action).map_err(|e| e.to_string())?;
+                execute_action(&action).map_err(|e| e.to_string())?;
 
-            let delay = action.get_integer_parameter("Delay").unwrap_or(0);
-            if delay > 0 {
-                let sleep_interval = 50u64; // milliseconds
-                let mut elapsed_time = 0u64;
+                let delay = action.get_integer_parameter("Delay").unwrap_or(0);
+                if delay > 0 {
+                    let sleep_interval = 50u64; // milliseconds
+                    let mut elapsed_time = 0u64;
 
-                while elapsed_time < delay as u64 {
-                    if INTERRUPT_ORCHESTRATION.load(Ordering::Relaxed) {
-                        return Err("Execution cancelled.".to_string());
+                    while elapsed_time < delay as u64 {
+                        if INTERRUPT_ORCHESTRATION.load(Ordering::Relaxed) {
+                            return Err("Execution cancelled.".to_string());
+                        }
+
+                        thread::sleep(Duration::from_millis(sleep_interval));
+                        elapsed_time += sleep_interval;
                     }
-
-                    thread::sleep(Duration::from_millis(sleep_interval));
-                    elapsed_time += sleep_interval;
                 }
             }
         }
+
 
         Ok(())
     })
